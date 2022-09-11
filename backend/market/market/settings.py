@@ -114,7 +114,7 @@ REST_FRAMEWORK = {
         "knox.auth.TokenAuthentication",
     ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",
-    "PAGE_SIZE": 200,
+    "PAGE_SIZE": 48,
 }
 
 CACHES = {

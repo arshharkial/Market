@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 import os
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,10 +22,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config("DEBUG", default=False, cast=bool)
 
 ALLOWED_HOSTS = ["*"]
 
@@ -42,6 +43,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "drf_yasg",
     "knox",
+    "user",
+    "django_rest_passwordreset",
 ]
 
 MIDDLEWARE = [
@@ -81,10 +84,11 @@ WSGI_APPLICATION = "market.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("POSTGRES_NAME", "market"),
-        "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
-        "USER": os.environ.get("POSTGRES_USER", "postgres"),
-        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "password"),
+        "NAME": config("POSTGRES_NAME", default="market", cast=str),
+        "HOST": config("POSTGRES_HOST", default="localhost", cast=str),
+        "USER": config("POSTGRES_USER", default="postgres", cast=str),
+        "PASSWORD": config("POSTGRES_PASSWORD", default="password", cast=str),
+        "PORT": config("POSTGRES_PORT", default=5432, cast=int),
     }
 }
 
@@ -117,22 +121,22 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 48,
 }
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            # "SERIALIZER": "django_redis.serializers.msgpack.MSGPackSerializer",
-            # "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
-        },
-        # "KEY_PREFIX": "example",
-    }
-}
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         "LOCATION": "redis://127.0.0.1:6379/1",
+#         "OPTIONS": {
+#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#             # "SERIALIZER": "django_redis.serializers.msgpack.MSGPackSerializer",
+#             # "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
+#         },
+#         # "KEY_PREFIX": "example",
+#     }
+# }
 
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-SESSION_CACHE_ALIAS = "default"
-CACHE_TTL = 60 * 1
+# SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+# SESSION_CACHE_ALIAS = "default"
+# CACHE_TTL = 60 * 1
 
 
 # Internationalization
@@ -148,13 +152,15 @@ USE_L10N = True
 
 USE_TZ = True
 
+AUTH_USER_MODEL = "user.User"
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
-STATIC_ROOT = os.path.join(BASE_DIR, "assets")
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+# STATIC_ROOT = os.path.join(BASE_DIR, "assets")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

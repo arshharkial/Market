@@ -4,9 +4,8 @@ from rest_framework.authtoken.serializers import AuthTokenSerializer
 from knox.views import LoginView as KnoxLoginView
 from rest_framework import generics, permissions
 from rest_framework.response import Response
-
-# from knox.models import AuthToken
-from .serializers import UserSerializer, RegisterSerializer, ChangePasswordSerializer
+from .models import Address
+from .serializers import AddressSerializer, UserSerializer, RegisterSerializer, ChangePasswordSerializer
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 import boto3
@@ -15,10 +14,12 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.contrib.auth.tokens import default_token_generator
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from .permissions import IsOwnerOrReadOnly
+from .permissions import IsOwnerOrReadOnly, IsOwner
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from django.contrib.auth import get_user_model
+
+# from knox.models import AuthToken
 
 User = get_user_model()
 
@@ -173,6 +174,25 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsOwnerOrReadOnly]
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+
+class AddressList(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = AddressSerializer
+
+    def get_queryset(self):
+        print(self.request.user)
+        if self.request.user:
+            return Address.objects.filter(user=self.request.user)
+        else:
+            return []
+
+
+# @method_decorator(cache_page(CACHE_TTL), name="dispatch")
+class AddressDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsOwner]
+    queryset = Address.objects.all()
+    serializer_class = AddressSerializer
 
 
 @api_view(["POST"])

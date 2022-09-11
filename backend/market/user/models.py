@@ -5,8 +5,8 @@ from django.contrib.auth.models import AbstractUser
 # from django_rest_passwordreset.signals import reset_password_token_created
 
 USERTYPE = [
-    ("seller", "SELLER"),
-    ("buyer", "BUYER"),
+    ("seller", "seller"),
+    ("buyer", "buyer"),
 ]
 
 

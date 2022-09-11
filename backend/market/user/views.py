@@ -8,7 +8,6 @@ from rest_framework.response import Response
 # from knox.models import AuthToken
 from .serializers import UserSerializer, RegisterSerializer, ChangePasswordSerializer
 from rest_framework import status
-from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
 import boto3
 from django.template.loader import render_to_string
@@ -19,6 +18,9 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from .permissions import IsOwnerOrReadOnly
 from django.shortcuts import render
 from rest_framework.decorators import api_view
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 ses_client = boto3.client("ses", region_name="us-west-2")
 
@@ -70,6 +72,8 @@ class LoginAPI(KnoxLoginView):
 
     def post(self, request, format=None):
         user = User.objects.filter(username=request.data.get("username", "")).first()
+        if not user:
+            user = User.objects.filter(email=request.data.get("email", "")).first()
         if user:
             if not user.is_active:
                 return Response(
@@ -77,7 +81,11 @@ class LoginAPI(KnoxLoginView):
                     status=status.HTTP_403_FORBIDDEN,
                 )
             else:
-                serializer = AuthTokenSerializer(data=request.data)
+                data = {
+                    "username": user.username,
+                    "password": request.data.get("password"),
+                }
+                serializer = AuthTokenSerializer(data=data)
                 serializer.is_valid(raise_exception=True)
                 user = serializer.validated_data["user"]
                 login(request, user)

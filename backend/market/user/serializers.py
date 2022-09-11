@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 # User Serializer
@@ -24,6 +26,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         :param validated_data: The data that was validated by the serializer
         :return: The user object is being returned.
         """
+
         model = User
         fields = (
             "id",

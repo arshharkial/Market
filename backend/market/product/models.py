@@ -42,11 +42,14 @@ class Product(models.Model):
         default=list,
         null=True,
     )
+    deleted = models.BooleanField(blank=False, null=False, default=False)
+    date_created = models.DateTimeField(auto_now_add=True)
+    last_edited = models.DateTimeField(auto_now=True)
 
 
 class Reviews(models.Model):
     product = models.ForeignKey(
-        Product, on_delete=models.CASCADE, related_name="my_reviews"
+        Product, on_delete=models.CASCADE, related_name="my_recieved_reviews"
     )
     title = models.CharField(max_length=300, blank=False, null=False)
     description = models.TextField()
@@ -76,3 +79,6 @@ class Reviews(models.Model):
         default=list,
         null=True,
     )
+    deleted = models.BooleanField(blank=False, null=False, default=False)
+    date_created = models.DateTimeField(auto_now_add=True)
+    last_edited = models.DateTimeField(auto_now=True)

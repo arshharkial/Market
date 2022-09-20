@@ -266,6 +266,8 @@ class Address(models.Model):
     phone_number = models.CharField(max_length=15, blank=False, null=False)
     country_code = models.CharField(max_length=10, blank=False, null=False, choices=COUNTRY_CODES, default="")
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="my_addresses")
+    date_created = models.DateTimeField(auto_now_add=True)
+    last_edited = models.DateTimeField(auto_now=True)
 
 
 # @receiver(reset_password_token_created)
